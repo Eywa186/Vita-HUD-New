@@ -16,23 +16,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare v5 source from ZIP
+      - name: Prepare v5.2 source from ZIP
         run: |
           echo "Repo root:"
           ls -la
 
           rm -rf VitaHUD_PAF_v1
-          rm -rf VitaHUD_PAF_v5_vdsuite_real_paf_probe
+          rm -rf VitaHUD_PAF_v5_2_include_next_fix
 
-          cmake -E tar xf VitaHUD_PAF_v5_vdsuite_real_paf_probe.zip --format=zip
+          cmake -E tar xf VitaHUD_PAF_v5_2_include_next_fix.zip --format=zip
 
           echo "After extracting:"
           ls -la
 
-          if [ -d VitaHUD_PAF_v5_vdsuite_real_paf_probe ]; then
-            mv VitaHUD_PAF_v5_vdsuite_real_paf_probe VitaHUD_PAF_v1
+          if [ -d VitaHUD_PAF_v5_2_include_next_fix ]; then
+            mv VitaHUD_PAF_v5_2_include_next_fix VitaHUD_PAF_v1
           else
-            echo "ERROR: extracted folder VitaHUD_PAF_v5_vdsuite_real_paf_probe not found"
+            echo "ERROR: extracted folder VitaHUD_PAF_v5_2_include_next_fix not found"
             find . -maxdepth 3 -type d -print
             exit 1
           fi
@@ -47,6 +47,10 @@ jobs:
           ls -la external/vdsuite/sdk/target/include/vdsuite/user | head || true
           ls -la external/vdsuite/sdk/target/lib/vdsuite | grep Paf || true
 
+          echo "Checking compat_after:"
+          ls -la external/vdsuite/compat_after || true
+          cat external/vdsuite/compat_after/ctrl.h || true
+
       - name: Configure
         working-directory: VitaHUD_PAF_v1
         run: |
@@ -57,7 +61,9 @@ jobs:
           cmake .. \
             -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake \
             -DCMAKE_BUILD_TYPE=Release \
-            -DVITAHUD_USE_REAL_PAF=ON
+            -DVITAHUD_USE_REAL_PAF=ON \
+            -DCMAKE_CXX_FLAGS="-I../external/vdsuite/compat_after" \
+            -DCMAKE_C_FLAGS="-I../external/vdsuite/compat_after"
 
       - name: Build
         working-directory: VitaHUD_PAF_v1/build
@@ -85,13 +91,14 @@ jobs:
           fi
 
           cat > build/VitaHUD_PAF_v5_package/docs/STATUS.txt <<'EOF'
-          VitaHUD PAF v5 VDSuite probe
+          VitaHUD PAF v5.2 VDSuite probe
 
           Goal:
-          - Test bundled real VDSuite PAF headers/libs in GitHub Actions.
+          - Test bundled real VDSuite PAF headers/libs.
+          - Force compat_after include path for include_next fixes.
 
           If this fails:
-          - The error will show which PAF API mismatch must be adapted next.
+          - The error will show the next VDSuite/API mismatch.
           EOF
 
           cd build
@@ -101,7 +108,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: VitaHUD-PAF-v5-vdsuite-probe
+          name: VitaHUD-PAF-v5.2-vdsuite-probe
           path: |
             VitaHUD_PAF_v1/build/vitahud_paf_v5.suprx
             VitaHUD_PAF_v1/build/VitaHUD_PAF_v5_package.tar.gz
