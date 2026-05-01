@@ -1,23 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(VitaHUD_PAF_v1 C CXX)
+project(VitaHUD_PAF_v2 C CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_library(VitaHUD_PAF_v1 MODULE
+add_library(VitaHUD_PAF_v2 MODULE
     VitaHUD_Shell/main.cpp
     VitaHUD_Shell/hud.cpp
     VitaHUD_Shell/menu.cpp
     VitaHUD_Shell/profile.cpp
 )
 
-target_include_directories(VitaHUD_PAF_v1 PRIVATE
+target_include_directories(VitaHUD_PAF_v2 PRIVATE
     VitaHUD_Shell
 )
 
-# PAF/plugin linking is not fully wired yet.
-# This phase is to get the source moving through VitaSDK first.
-target_link_libraries(VitaHUD_PAF_v1
+target_link_libraries(VitaHUD_PAF_v2
     SceLibKernel_stub
     SceKernelThreadMgr_stub
     SceCtrl_stub
@@ -26,7 +24,11 @@ target_link_libraries(VitaHUD_PAF_v1
     SceIofilemgr_stub
 )
 
-set_target_properties(VitaHUD_PAF_v1 PROPERTIES
-    OUTPUT_NAME "vitahud_paf_v1"
+set_target_properties(VitaHUD_PAF_v2 PROPERTIES
+    OUTPUT_NAME "vitahud_paf_v2"
     SUFFIX ".suprx"
 )
+
+# RCO resource files are staged here for the real PAF wiring phase.
+# They are not compiled by this CMake file yet because the normal
+# GitHub VitaSDK container does not include the full PAF/RCO pipeline.

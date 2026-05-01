@@ -8,12 +8,18 @@
 #include "menu.h"
 #include "profile.h"
 
-
-
-
 namespace vitahud
 {
-    paf::Plugin *g_corePlugin = NULL;
+    /*
+     * Temporary local plugin object for the compatibility shim.
+     *
+     * Real PAF phase:
+     * g_corePlugin should be assigned from the shell/plugin context instead
+     * of this local fallback.
+     */
+    static paf::Plugin s_fallbackPlugin;
+    paf::Plugin *g_corePlugin = &s_fallbackPlugin;
+
     Settings g_settings;
 
     static SceUID g_inputThread = -1;
@@ -82,6 +88,13 @@ namespace vitahud
             if (g_settings.menuOpen) {
                 Menu::HandleInput(buttons, pressed);
             }
+
+            /*
+             * Phase 1/2 test:
+             * Call HUD update manually while the PAF main-thread callback is not wired.
+             * Real PAF phase should register Hud::Update with the shell UI callback system.
+             */
+            Hud::Update(NULL);
 
             lastButtons = buttons;
             sceKernelDelayThread(16000);

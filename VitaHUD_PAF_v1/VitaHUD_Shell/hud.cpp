@@ -4,15 +4,13 @@
 namespace vitahud
 {
     using namespace paf;
+
+    static paf::ui::Plane *s_hudPage = NULL;
     static paf::ui::Plane *s_hudRoot = NULL;
     static paf::ui::Text *s_hudText = NULL;
 
     static SceUInt64 s_lastCacheTick = 0;
-
-    static int s_cachedFps = 0;
-    static int s_oldFps = -1;
-
-    static char s_cachedLine[128] = "FPS --  BAT --%  --:--";
+    static char s_cachedLine[128] = "VITAHUD PAF TEST";
 
     static int AppendText(char *out, int pos, const char *text)
     {
@@ -72,28 +70,47 @@ namespace vitahud
 
     void Hud::Create()
     {
+        if (!g_corePlugin) {
+            return;
+        }
+
+        Plugin::PageOpenParam pageParam;
+        Plugin::TemplateOpenParam templateParam;
+
         /*
-         * Phase 1 skeleton:
-         * This is where the final version should open a PAF page/template and
-         * locate/create text widgets.
-         *
-         * Intended flow:
-         *
-         * Plugin::PageOpenParam pgiParam;
-         * pgiParam.overwrite_draw_priority = 6;
-         * pageRoot = g_corePlugin->PageOpen("vitahud_page", pgiParam);
-         * s_hudText = created/found Text object;
-         * common::MainThreadCallList::Register(Update, NULL);
-         *
-         * The exact widget creation depends on your PAF/RCO setup.
+         * Real PAF target:
+         * This is the important structure we wanted:
+         * - open a PAF page
+         * - set draw priority
+         * - open a HUD template
+         * - find the HUD text object
          */
+        pageParam.overwrite_draw_priority = 6;
+        s_hudPage = g_corePlugin->PageOpen("vitahud_page_hud", pageParam);
+
+        if (!s_hudPage) {
+            return;
+        }
+
+        g_corePlugin->TemplateOpen(s_hudPage, VITAHUD_TEMPLATE_HUD_TEST, templateParam);
+
+        s_hudRoot = s_hudPage->GetChild(s_hudPage->GetChildrenNum() - 1);
+        s_hudText = (paf::ui::Text *)s_hudRoot->FindChild(VITAHUD_TEXT_HUD_TEST);
+
+        SetPosition(g_settings.hudPosition);
+        SetVisible(g_settings.hudEnabled);
+        Update(NULL);
     }
 
     void Hud::Destroy()
     {
-        /*
-         * Unregister main-thread callback and close PAF page here.
-         */
+        if (g_corePlugin && s_hudPage) {
+            Plugin::PageCloseParam closeParam;
+            closeParam.fade = true;
+            g_corePlugin->PageClose("vitahud_page_hud", closeParam);
+        }
+
+        s_hudPage = NULL;
         s_hudRoot = NULL;
         s_hudText = NULL;
     }
@@ -161,11 +178,7 @@ namespace vitahud
         char line[128];
         int pos = 0;
 
-        if (g_settings.showFps) {
-            pos = AppendText(line, pos, "FPS ");
-            pos = AppendInt(line, pos, s_cachedFps);
-            pos = AppendText(line, pos, "  ");
-        }
+        pos = AppendText(line, pos, "VITAHUD PAF TEST  ");
 
         if (g_settings.showBattery) {
             pos = AppendText(line, pos, "BAT ");
@@ -175,33 +188,6 @@ namespace vitahud
 
         if (g_settings.showTime) {
             BuildTime(line, &pos);
-            pos = AppendText(line, pos, "  ");
-        }
-
-        if (g_settings.showCpu) {
-            pos = AppendText(line, pos, "CPU ");
-            pos = AppendInt(line, pos, scePowerGetArmClockFrequency());
-            pos = AppendText(line, pos, "M  ");
-        }
-
-        if (g_settings.showBus) {
-            pos = AppendText(line, pos, "BUS ");
-            pos = AppendInt(line, pos, scePowerGetBusClockFrequency());
-            pos = AppendText(line, pos, "M  ");
-        }
-
-        if (g_settings.showGpu) {
-            pos = AppendText(line, pos, "GPU ");
-            pos = AppendInt(line, pos, scePowerGetGpuClockFrequency());
-            pos = AppendText(line, pos, "M  ");
-        }
-
-        if (g_settings.showRam) {
-            pos = AppendText(line, pos, "RAM OFF  ");
-        }
-
-        if (g_settings.showIp) {
-            pos = AppendText(line, pos, "IP OFF");
         }
 
         for (int i = 0; i < 128; i++) {
@@ -219,9 +205,6 @@ namespace vitahud
             return;
         }
 
-        /*
-         * Convert cached ASCII to wide string for PAF Text.
-         */
         wchar_t wbuf[128];
 
         int i = 0;
@@ -243,12 +226,6 @@ namespace vitahud
         if (!g_settings.hudEnabled) {
             return;
         }
-
-        /*
-         * FPS source placeholder:
-         * Phase 1 keeps this local. Phase 2 should use a real FPS provider.
-         */
-        s_cachedFps = s_oldFps >= 0 ? s_oldFps : 0;
 
         UpdateCachedText();
         ApplyText();

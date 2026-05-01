@@ -5,6 +5,8 @@
 namespace vitahud
 {
     using namespace paf;
+
+    static paf::ui::Plane *s_menuPage = NULL;
     static paf::ui::Plane *s_menuRoot = NULL;
     static paf::ui::Text *s_menuText = NULL;
 
@@ -114,20 +116,36 @@ namespace vitahud
 
     void Menu::Open()
     {
-        /*
-         * Phase 1 skeleton:
-         * Final version should open/create a PAF page/template for the menu.
-         *
-         * Use MENU BG to control the menu panel color.
-         */
+        if (!g_corePlugin) {
+            return;
+        }
+
+        if (!s_menuPage) {
+            Plugin::PageOpenParam pageParam;
+            Plugin::TemplateOpenParam templateParam;
+
+            pageParam.overwrite_draw_priority = 7;
+            s_menuPage = g_corePlugin->PageOpen("vitahud_page_menu", pageParam);
+
+            if (s_menuPage) {
+                g_corePlugin->TemplateOpen(s_menuPage, VITAHUD_TEMPLATE_MENU_TEST, templateParam);
+                s_menuRoot = s_menuPage->GetChild(s_menuPage->GetChildrenNum() - 1);
+                s_menuText = (paf::ui::Text *)s_menuRoot->FindChild(VITAHUD_TEXT_MENU_TEST);
+            }
+        }
+
+        if (s_menuRoot) {
+            s_menuRoot->Show(common::transition::Type_Fadein1);
+        }
+
         RebuildText();
     }
 
     void Menu::Close()
     {
-        /*
-         * Close/hide PAF menu page here.
-         */
+        if (s_menuRoot) {
+            s_menuRoot->Hide(common::transition::Type_Fadeout1);
+        }
     }
 
     void Menu::HandleInput(unsigned int buttons, unsigned int pressed)
@@ -267,8 +285,8 @@ namespace vitahud
         wchar_t wbuf[1024];
         int pos = 0;
 
-        AppendAscii(wbuf, &pos, "VITAHUD ULTIMATE\\n");
-        AppendAscii(wbuf, &pos, "----------------\\n");
+        AppendAscii(wbuf, &pos, "VITAHUD PAF TEST MENU\\n");
+        AppendAscii(wbuf, &pos, "---------------------\\n");
 
         int visible = 11;
 
@@ -288,7 +306,7 @@ namespace vitahud
             AppendAscii(wbuf, &pos, "\\n");
         }
 
-        AppendAscii(wbuf, &pos, "----------------\\n");
+        AppendAscii(wbuf, &pos, "---------------------\\n");
         AppendAscii(wbuf, &pos, "UP/DOWN MOVE  LEFT/RIGHT CHANGE  O CLOSE");
 
         paf::wstring text = wbuf;

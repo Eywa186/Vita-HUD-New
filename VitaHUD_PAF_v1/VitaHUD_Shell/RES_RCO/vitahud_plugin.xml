@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  VitaHUD PAF v2 resource skeleton.
+
+  This is intentionally minimal. It documents the target resources that the
+  C++ side expects:
+
+  Page names:
+    vitahud_page_hud
+    vitahud_page_menu
+
+  Template IDs:
+    VITAHUD_TEMPLATE_HUD_TEST  = 1000
+    VITAHUD_TEMPLATE_MENU_TEST = 1001
+
+  Text IDs:
+    VITAHUD_TEXT_HUD_TEST  = 2000
+    VITAHUD_TEXT_MENU_TEST = 2001
+
+  Real RCO compilation/wiring is the next phase.
+-->
+<resource>
+  <page name="vitahud_page_hud">
+    <template id="1000" name="vitahud_template_hud_test">
+      <text id="2000" name="vitahud_text_hud_test">VITAHUD PAF TEST</text>
+    </template>
+  </page>
+
+  <page name="vitahud_page_menu">
+    <template id="1001" name="vitahud_template_menu_test">
+      <text id="2001" name="vitahud_text_menu_test">VITAHUD PAF TEST MENU</text>
+    </template>
+  </page>
+</resource>

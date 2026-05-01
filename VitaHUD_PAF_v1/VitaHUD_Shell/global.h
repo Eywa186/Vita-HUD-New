@@ -1,8 +1,9 @@
 #pragma once
 
 /*
- * VitaHUD PAF v1.1
+ * VitaHUD PAF v2
  * Header-path fixed for normal VitaSDK builds.
+ * Real PAF wiring will replace paf_compat.h later.
  */
 
 #include <psp2/types.h>
@@ -32,6 +33,13 @@ namespace vitahud
         MENU_BG_PURPLE,
         MENU_BG_TRANSPARENT,
         MENU_BG_COUNT
+    };
+
+    enum ResourceIds {
+        VITAHUD_TEMPLATE_HUD_TEST = 1000,
+        VITAHUD_TEMPLATE_MENU_TEST = 1001,
+        VITAHUD_TEXT_HUD_TEST = 2000,
+        VITAHUD_TEXT_MENU_TEST = 2001
     };
 
     struct Settings {
