@@ -1,74 +1,25 @@
-# Real PAF Setup Checklist
+# Real PAF Setup
 
-Phase 4 target: show `VITAHUD PAF TEST` through the shell/PAF overlay path.
+v4.1 adds:
 
-## 1. Real PAF headers
-
-You need real headers that provide:
-
-```cpp
-#include <paf.h>
+```txt
+external/paf/include/paf.h
 ```
 
-The normal `vitasdk/vitasdk` GitHub Actions image does not include them.
+This is a temporary bridge. Later, replace it with real PAF SDK headers.
 
-## 2. Real PAF imports/libraries
-
-Real mode must link the same shell/PAF imports your environment expects.
-
-CMake variables prepared:
+Current workflow configure line:
 
 ```bash
--DVITAHUD_PAF_INCLUDE_DIR=/path/to/headers
--DVITAHUD_PAF_LIBRARY_DIR=/path/to/libs
+cmake .. \
+  -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DVITAHUD_USE_REAL_PAF=ON \
+  -DVITAHUD_PAF_INCLUDE_DIR=../external/paf/include
 ```
 
-## 3. RCO compilation
-
-Current XML resource:
-
-```txt
-VitaHUD_Shell/RES_RCO/vitahud_plugin.xml
-```
-
-Target installed compiled file:
-
-```txt
-ur0:data/VitaHUD/vitahud_plugin.rco
-```
-
-CMake variable prepared:
-
-```bash
--DVITAHUD_RCO_COMPILER=/path/to/rco/compiler
-```
-
-## 4. g_corePlugin assignment
-
-Currently real mode has:
-
-```cpp
-paf::Plugin *g_corePlugin = NULL;
-```
-
-That must be assigned from the shell/plugin context before:
-
-```cpp
-Hud::Create();
-Menu::Open();
-```
-
-## 5. First hardware test
-
-Once real PAF is wired, first target is only:
-
-```txt
-VITAHUD PAF TEST
-```
-
-No RAM.
-No IP.
-No profiles.
-No advanced menu.
-
-One visible text label first.
+Still needed for actual overlay:
+- real PAF headers
+- real PAF import libs/stubs
+- real RCO compile
+- real g_corePlugin assignment
