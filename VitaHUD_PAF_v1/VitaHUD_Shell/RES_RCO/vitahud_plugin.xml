@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  VitaHUD PAF v2 resource skeleton.
+  VitaHUD PAF v4 real RCO target.
 
-  This is intentionally minimal. It documents the target resources that the
-  C++ side expects:
+  Target resources expected by C++:
 
-  Page names:
+  Pages:
     vitahud_page_hud
     vitahud_page_menu
 
   Template IDs:
-    VITAHUD_TEMPLATE_HUD_TEST  = 1000
-    VITAHUD_TEMPLATE_MENU_TEST = 1001
+    1000 = VITAHUD_TEMPLATE_HUD_TEST
+    1001 = VITAHUD_TEMPLATE_MENU_TEST
 
   Text IDs:
-    VITAHUD_TEXT_HUD_TEST  = 2000
-    VITAHUD_TEXT_MENU_TEST = 2001
+    2000 = VITAHUD_TEXT_HUD_TEST
+    2001 = VITAHUD_TEXT_MENU_TEST
 
-  Real RCO compilation/wiring is the next phase.
+  This XML is staged. Real .rco compilation is environment/tool dependent.
 -->
 <resource>
   <page name="vitahud_page_hud">

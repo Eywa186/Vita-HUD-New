@@ -1,9 +1,16 @@
 #pragma once
 
 /*
- * VitaHUD PAF v2
- * Header-path fixed for normal VitaSDK builds.
- * Real PAF wiring will replace paf_compat.h later.
+ * VitaHUD PAF v4
+ *
+ * This is the real PAF/RCO wiring start.
+ *
+ * Default GitHub mode:
+ *   uses paf_compat.h so Actions still compiles.
+ *
+ * Real hardware/PAF mode:
+ *   build with -DVITAHUD_USE_REAL_PAF=ON
+ *   and provide real PAF headers/imports.
  */
 
 #include <psp2/types.h>
@@ -12,7 +19,11 @@
 #include <psp2/power.h>
 #include <psp2/rtc.h>
 
+#ifdef VITAHUD_USE_REAL_PAF
+#include <paf.h>
+#else
 #include "paf_compat.h"
+#endif
 
 namespace vitahud
 {
@@ -41,6 +52,9 @@ namespace vitahud
         VITAHUD_TEXT_HUD_TEST = 2000,
         VITAHUD_TEXT_MENU_TEST = 2001
     };
+
+    static const char *VITAHUD_RCO_PATH = "ur0:data/VitaHUD/vitahud_plugin.rco";
+    static const char *VITAHUD_XML_PATH = "ur0:data/VitaHUD/vitahud_plugin.xml";
 
     struct Settings {
         bool hudEnabled;

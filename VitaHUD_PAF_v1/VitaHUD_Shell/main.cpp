@@ -7,18 +7,28 @@
 #include "hud.h"
 #include "menu.h"
 #include "profile.h"
+#include "paf_real_notes.h"
 
 namespace vitahud
 {
+#ifndef VITAHUD_USE_REAL_PAF
     /*
-     * Temporary local plugin object for the compatibility shim.
-     *
-     * Real PAF phase:
-     * g_corePlugin should be assigned from the shell/plugin context instead
-     * of this local fallback.
+     * Compatibility fallback for GitHub Actions only.
+     * Real PAF builds must replace this with the shell/plugin-provided
+     * core plugin object.
      */
     static paf::Plugin s_fallbackPlugin;
     paf::Plugin *g_corePlugin = &s_fallbackPlugin;
+#else
+    /*
+     * Real PAF mode:
+     * g_corePlugin must be assigned from the Vita shell/plugin context.
+     *
+     * This is the next hardware-specific piece.
+     * Until that is wired, real PAF mode may compile but will not display.
+     */
+    paf::Plugin *g_corePlugin = NULL;
+#endif
 
     Settings g_settings;
 
@@ -90,11 +100,11 @@ namespace vitahud
             }
 
             /*
-             * Phase 1/2 test:
-             * Call HUD update manually while the PAF main-thread callback is not wired.
-             * Real PAF phase should register Hud::Update with the shell UI callback system.
+             * Temporary update call.
+             * Real PAF mode should move this to the shell main-thread callback.
              */
             Hud::Update(NULL);
+            Menu::Update(NULL);
 
             lastButtons = buttons;
             sceKernelDelayThread(16000);
@@ -110,6 +120,16 @@ extern "C" int module_start(SceSize args, const void *argp)
     (void)argp;
 
     vitahud::LoadProfile();
+
+#ifdef VITAHUD_USE_REAL_PAF
+    /*
+     * Real PAF mode safeguard.
+     * If g_corePlugin is not assigned yet, avoid crashing.
+     */
+    if (!vitahud::g_corePlugin) {
+        return SCE_KERNEL_START_SUCCESS;
+    }
+#endif
 
     vitahud::Hud::Create();
     vitahud::Hud::SetVisible(vitahud::g_settings.hudEnabled);
