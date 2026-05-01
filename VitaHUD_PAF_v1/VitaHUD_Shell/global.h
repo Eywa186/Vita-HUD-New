@@ -5,7 +5,7 @@
  * Header-path fixed for normal VitaSDK builds.
  */
 
-#include <psp2/kernel/types.h>
+#include <psp2/types.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/ctrl.h>
 #include <psp2/power.h>

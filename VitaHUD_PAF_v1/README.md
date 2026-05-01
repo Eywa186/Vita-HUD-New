@@ -60,3 +60,8 @@ Add RAM through a kernel-side helper instead of direct userland framebuffer/plug
 ## v1.1
 
 Fixed VitaSDK header paths such as `kernel.h` -> `psp2/kernel/threadmgr.h`.
+
+
+## v1.2
+
+Fixed invalid header `psp2/kernel/types.h` -> `psp2/types.h`.
