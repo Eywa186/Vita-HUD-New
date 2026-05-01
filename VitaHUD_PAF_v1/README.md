@@ -65,3 +65,13 @@ Fixed VitaSDK header paths such as `kernel.h` -> `psp2/kernel/threadmgr.h`.
 ## v1.2
 
 Fixed invalid header `psp2/kernel/types.h` -> `psp2/types.h`.
+
+## v1.3
+
+Added `VitaHUD_Shell/paf_compat.h`.
+
+This is a temporary compile shim for GitHub Actions because the normal VitaSDK
+container does not include real `paf.h`.
+
+This version is for build-progress only. It does not create a real visible PAF
+overlay until real PAF headers/RCO wiring are added.

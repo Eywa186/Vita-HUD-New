@@ -11,7 +11,7 @@
 #include <psp2/power.h>
 #include <psp2/rtc.h>
 
-#include <paf.h>
+#include "paf_compat.h"
 
 namespace vitahud
 {
