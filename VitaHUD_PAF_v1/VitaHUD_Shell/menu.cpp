@@ -4,6 +4,7 @@
 
 namespace vitahud
 {
+    using namespace paf;
     static paf::ui::Plane *s_menuRoot = NULL;
     static paf::ui::Text *s_menuText = NULL;
 

@@ -3,6 +3,7 @@
 
 namespace vitahud
 {
+    using namespace paf;
     static paf::ui::Plane *s_hudRoot = NULL;
     static paf::ui::Text *s_hudText = NULL;
 

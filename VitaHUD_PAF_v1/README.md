@@ -95,3 +95,18 @@ The GitHub VitaSDK container did not define:
 
 For now we only need the skeleton compiling. Real module metadata/export setup can be added after
 the PAF structure compiles.
+
+## v1.6
+
+Fixed namespace compatibility for the temporary PAF shim.
+
+Added:
+```cpp
+using namespace paf;
+```
+
+inside `hud.cpp` and `menu.cpp`, so references like:
+```cpp
+common::transition::Type_Fadein1
+```
+compile against the compatibility shim.
