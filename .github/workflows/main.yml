@@ -1,0 +1,40 @@
+name: Build VitaHUD PAF
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: vitasdk/vitasdk:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure
+        working-directory: VitaHUD_PAF_v1
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+
+      - name: Build
+        working-directory: VitaHUD_PAF_v1/build
+        run: make
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: VitaHUD-PAF-v1-build
+          path: |
+            VitaHUD_PAF_v1/build/*.suprx
+            VitaHUD_PAF_v1/build/*.elf
+            VitaHUD_PAF_v1/build/*.velf
