@@ -84,3 +84,14 @@ Changed:
 - `SCE_MODULE_INFO(...)` -> `PSP2_MODULE_INFO(...)`
 - removed unsupported `SCE_MODULE_START(...)`
 - removed unsupported `SCE_MODULE_STOP(...)`
+
+## v1.5
+
+Removed module-info macro entirely for the first compile pass.
+
+The GitHub VitaSDK container did not define:
+- `SCE_MODULE_INFO`
+- `PSP2_MODULE_INFO`
+
+For now we only need the skeleton compiling. Real module metadata/export setup can be added after
+the PAF structure compiles.

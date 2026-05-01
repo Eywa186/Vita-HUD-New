@@ -1,5 +1,4 @@
 #include <psp2/kernel/modulemgr.h>
-#include <psp2/kernel/processmgr.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/ctrl.h>
 #include <taihen.h>
@@ -9,7 +8,6 @@
 #include "menu.h"
 #include "profile.h"
 
-PSP2_MODULE_INFO(0, 0, "VitaHUD_PAF_v1");
 
 
 
