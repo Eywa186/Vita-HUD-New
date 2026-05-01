@@ -22,17 +22,17 @@ jobs:
           ls -la
 
           rm -rf VitaHUD_PAF_v1
-          rm -rf VitaHUD_PAF_v5_5_libsha1_bridge_fix
+          rm -rf VitaHUD_PAF_v5_6_vdsuite_type_bridge_fix
 
-          cmake -E tar xf VitaHUD_PAF_v5_5_libsha1_bridge_fix.zip --format=zip
+          cmake -E tar xf VitaHUD_PAF_v5_6_vdsuite_type_bridge_fix.zip --format=zip
 
           echo "After extracting:"
           ls -la
 
-          if [ -d VitaHUD_PAF_v5_5_libsha1_bridge_fix ]; then
-            mv VitaHUD_PAF_v5_5_libsha1_bridge_fix VitaHUD_PAF_v1
+          if [ -d VitaHUD_PAF_v5_6_vdsuite_type_bridge_fix ]; then
+            mv VitaHUD_PAF_v5_6_vdsuite_type_bridge_fix VitaHUD_PAF_v1
           else
-            echo "ERROR: extracted folder VitaHUD_PAF_v5_5_libsha1_bridge_fix not found"
+            echo "ERROR: extracted folder VitaHUD_PAF_v5_6_vdsuite_type_bridge_fix not found"
             find . -maxdepth 3 -type d -print
             exit 1
           fi
