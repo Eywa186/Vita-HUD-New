@@ -75,3 +75,12 @@ container does not include real `paf.h`.
 
 This version is for build-progress only. It does not create a real visible PAF
 overlay until real PAF headers/RCO wiring are added.
+
+## v1.4
+
+Fixed module macros for the GitHub VitaSDK container.
+
+Changed:
+- `SCE_MODULE_INFO(...)` -> `PSP2_MODULE_INFO(...)`
+- removed unsupported `SCE_MODULE_START(...)`
+- removed unsupported `SCE_MODULE_STOP(...)`

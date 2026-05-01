@@ -1,4 +1,5 @@
 #include <psp2/kernel/modulemgr.h>
+#include <psp2/kernel/processmgr.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/ctrl.h>
 #include <taihen.h>
@@ -8,9 +9,9 @@
 #include "menu.h"
 #include "profile.h"
 
-SCE_MODULE_INFO("VitaHUD_PAF_v1", SCE_MODULE_ATTR_NONE, 1, 0);
-SCE_MODULE_START(module_start);
-SCE_MODULE_STOP(module_stop);
+PSP2_MODULE_INFO(0, 0, "VitaHUD_PAF_v1");
+
+
 
 namespace vitahud
 {
