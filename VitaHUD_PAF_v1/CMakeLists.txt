@@ -25,7 +25,8 @@ target_link_libraries(VitaHUD_PAF_v3
 )
 
 set_target_properties(VitaHUD_PAF_v3 PROPERTIES
-    OUTPUT_NAME "vitahud_paf_v2"
+    PREFIX ""
+    OUTPUT_NAME "vitahud_paf_v3"
     SUFFIX ".suprx"
 )
 

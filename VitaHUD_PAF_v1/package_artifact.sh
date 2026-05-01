@@ -10,9 +10,13 @@ mkdir -p "$PACKAGE_DIR/ur0/tai"
 mkdir -p "$PACKAGE_DIR/ur0/data/VitaHUD"
 mkdir -p "$PACKAGE_DIR/docs"
 
-# Copy plugin if it exists.
-if [ -f "$BUILD_DIR/vitahud_paf_v2.suprx" ]; then
-  cp "$BUILD_DIR/vitahud_paf_v2.suprx" "$PACKAGE_DIR/ur0/tai/vitahud_paf_v2.suprx"
+# Copy plugin.
+if [ -f "$BUILD_DIR/vitahud_paf_v3.suprx" ]; then
+  cp "$BUILD_DIR/vitahud_paf_v3.suprx" "$PACKAGE_DIR/ur0/tai/vitahud_paf_v3.suprx"
+elif [ -f "$BUILD_DIR/libvitahud_paf_v3.suprx" ]; then
+  cp "$BUILD_DIR/libvitahud_paf_v3.suprx" "$PACKAGE_DIR/ur0/tai/vitahud_paf_v3.suprx"
+elif [ -f "$BUILD_DIR/libvitahud_paf_v2.suprx" ]; then
+  cp "$BUILD_DIR/libvitahud_paf_v2.suprx" "$PACKAGE_DIR/ur0/tai/vitahud_paf_v3.suprx"
 fi
 
 # Stage RCO/XML resources for the real PAF wiring phase.
@@ -21,28 +25,27 @@ if [ -d "$PROJECT_ROOT/VitaHUD_Shell/RES_RCO" ]; then
 fi
 
 cat > "$PACKAGE_DIR/INSTALL.txt" <<'EOF'
-VitaHUD PAF v3 packaged artifact
+VitaHUD PAF v3.1 packaged artifact
 
 Current status:
 - This is a packaged compile-test build.
 - It still uses paf_compat.h for GitHub Actions compilation.
 - It is not the final real PAF overlay yet.
 
-Install path target later:
-  ur0:tai/vitahud_paf_v2.suprx
-  ur0:data/VitaHUD/vitahud_plugin.rco
+Package contents:
+  ur0:tai/vitahud_paf_v3.suprx
+  ur0:data/VitaHUD/vitahud_plugin.xml
+  ur0:data/VitaHUD/locale/vitahud_locale_en.xml
 
-For this staged build, RES_RCO XML files are included as preparation only.
-
-Example tai config target later:
+Future tai config target:
   *main
-  ur0:tai/vitahud_paf_v2.suprx
+  ur0:tai/vitahud_paf_v3.suprx
 
 Do not replace your stable old VitaHUD yet.
 EOF
 
 cat > "$PACKAGE_DIR/docs/STATUS.txt" <<'EOF'
-VitaHUD PAF v3 status
+VitaHUD PAF v3.1 status
 
 Working:
 - VitaSDK GitHub Actions build
@@ -51,6 +54,7 @@ Working:
 - Profile source split
 - RES_RCO staging folder
 - Packaged artifact output
+- Clean SUPRX filename without lib prefix
 
 Not final yet:
 - Real PAF headers/imports
@@ -60,4 +64,5 @@ Not final yet:
 EOF
 
 cd "$BUILD_DIR"
+rm -f VitaHUD_PAF_v3_package.zip
 zip -r VitaHUD_PAF_v3_package.zip VitaHUD_PAF_v3_package

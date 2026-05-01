@@ -1,57 +1,35 @@
-# VitaHUD PAF v3 Packaged Artifact
+# VitaHUD PAF v3.1 Artifact Fix
 
-This version keeps the successful v2 compile base and adds a clean packaged artifact output.
+This version fixes the GitHub Actions artifact output.
 
-## Current purpose
+## Fixed
 
-This is still a staged build. It proves the project can:
-
-- compile in GitHub Actions
-- build the C++ VitaHUD PAF structure
-- stage RES_RCO files
-- produce a clean package zip
-
-## Important
-
-This still uses:
+- Removes CMake `lib` prefix
+- Forces clean output:
 
 ```txt
-VitaHUD_Shell/paf_compat.h
+vitahud_paf_v3.suprx
 ```
 
-That means this is **not the final visible PAF overlay yet**.
-
-The next phase is real PAF/RCO wiring.
-
-## GitHub Actions
-
-Use the included workflow:
+- Packages a clean install-style ZIP:
 
 ```txt
-.github/workflows/build.yml
+VitaHUD_PAF_v3_package.zip
 ```
 
-It builds from:
-
-```txt
-VitaHUD_PAF_v1/
-```
-
-and creates:
-
-```txt
-VitaHUD_PAF_v1/build/VitaHUD_PAF_v3_package.zip
-```
+- Artifact upload now includes:
+  - `vitahud_paf_v3.suprx`
+  - `VitaHUD_PAF_v3_package.zip`
+  - staged `RES_RCO` resources
+  - package folder contents
 
 ## Package layout
-
-The package zip contains:
 
 ```txt
 VitaHUD_PAF_v3_package/
   ur0/
     tai/
-      vitahud_paf_v2.suprx
+      vitahud_paf_v3.suprx
     data/
       VitaHUD/
         vitahud_plugin.xml
@@ -62,20 +40,14 @@ VitaHUD_PAF_v3_package/
   INSTALL.txt
 ```
 
-## Status
+## Important
 
-Working:
+This still uses:
 
-- VitaSDK build
-- GitHub Actions artifact
-- package output
-- staged RCO/XML resources
-- HUD/Menu source structure
-- profile source structure
+```txt
+VitaHUD_Shell/paf_compat.h
+```
 
-Not final yet:
+So this is still a staged compile/package artifact, not the final visible PAF overlay.
 
-- real PAF headers/imports
-- compiled `.rco`
-- real visible overlay
-- RAM/IP telemetry
+The next phase is real PAF/RCO wiring.
