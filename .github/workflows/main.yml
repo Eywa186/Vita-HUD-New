@@ -33,15 +33,57 @@ jobs:
           export VITASDK=/usr/local/vitasdk
           export PATH=$VITASDK/bin:$PATH
           make VERBOSE=1
+          echo "Build directory:"
           ls -la
 
       - name: Package artifact
         working-directory: VitaHUD_PAF_v1
         run: |
-          chmod +x package_artifact.sh
-          ./package_artifact.sh
-          ls -la build
-          find build/VitaHUD_PAF_v3_package -type f -print || true
+          mkdir -p build/VitaHUD_PAF_v3_package/ur0/tai
+          mkdir -p build/VitaHUD_PAF_v3_package/ur0/data/VitaHUD
+          mkdir -p build/VitaHUD_PAF_v3_package/docs
+
+          if [ -f build/vitahud_paf_v3.suprx ]; then
+            cp build/vitahud_paf_v3.suprx build/VitaHUD_PAF_v3_package/ur0/tai/vitahud_paf_v3.suprx
+          fi
+
+          if [ -d VitaHUD_Shell/RES_RCO ]; then
+            cp -R VitaHUD_Shell/RES_RCO/* build/VitaHUD_PAF_v3_package/ur0/data/VitaHUD/ || true
+          fi
+
+          cat > build/VitaHUD_PAF_v3_package/INSTALL.txt <<'EOF'
+          VitaHUD PAF v3 package
+
+          Current status:
+          - Compile/package test build.
+          - Still uses paf_compat.h.
+          - Not final real PAF overlay yet.
+
+          Target paths later:
+          ur0:tai/vitahud_paf_v3.suprx
+          ur0:data/VitaHUD/
+          EOF
+
+          cat > build/VitaHUD_PAF_v3_package/docs/STATUS.txt <<'EOF'
+          VitaHUD PAF v3 status
+
+          Working:
+          - GitHub Actions build
+          - VitaSDK compile
+          - Clean SUPRX artifact
+          - Package folder output
+
+          Not final:
+          - Real PAF headers/imports
+          - Real RCO compile
+          - Real visible overlay
+          EOF
+
+          cd build
+          zip -r VitaHUD_PAF_v3_package.zip VitaHUD_PAF_v3_package
+
+          echo "Final build directory:"
+          ls -la
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
