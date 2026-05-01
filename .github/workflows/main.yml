@@ -3,8 +3,6 @@ name: Build VitaHUD PAF
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -35,14 +33,21 @@ jobs:
           export VITASDK=/usr/local/vitasdk
           export PATH=$VITASDK/bin:$PATH
           make VERBOSE=1
+          ls -la
+
+      - name: Package artifact
+        working-directory: VitaHUD_PAF_v1
+        run: |
+          chmod +x package_artifact.sh
+          ./package_artifact.sh
+          ls -la build
+          find build/VitaHUD_PAF_v3_package -type f -print || true
 
       - name: Upload artifact
-        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: VitaHUD-PAF-v1-build
+          name: VitaHUD-PAF-v3.1-package
           path: |
-            VitaHUD_PAF_v1/build/*.suprx
-            VitaHUD_PAF_v1/build/*.elf
-            VitaHUD_PAF_v1/build/*.velf
-            VitaHUD_PAF_v1/build/*.self
+            VitaHUD_PAF_v1/build/vitahud_paf_v3.suprx
+            VitaHUD_PAF_v1/build/VitaHUD_PAF_v3_package.zip
+            VitaHUD_PAF_v1/build/VitaHUD_PAF_v3_package/**
