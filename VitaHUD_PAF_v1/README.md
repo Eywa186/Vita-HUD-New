@@ -1,61 +1,81 @@
-# VitaHUD PAF v2 Visible Test
+# VitaHUD PAF v3 Packaged Artifact
 
-## Goal
+This version keeps the successful v2 compile base and adds a clean packaged artifact output.
 
-This is the next step after the compiling v1 skeleton.
+## Current purpose
 
-Target milestone:
+This is still a staged build. It proves the project can:
 
-```txt
-VITAHUD PAF TEST
-```
-
-The project now has a cleaner PS Vita shell/PAF-style layout:
-
-```txt
-VitaHUD_PAF_v1/
-  CMakeLists.txt
-  README.md
-  VitaHUD_Shell/
-    main.cpp
-    global.h
-    hud.cpp
-    hud.h
-    menu.cpp
-    menu.h
-    profile.cpp
-    profile.h
-    paf_compat.h
-    RES_RCO/
-      vitahud_plugin.xml
-      locale/
-        vitahud_locale_en.xml
-```
+- compile in GitHub Actions
+- build the C++ VitaHUD PAF structure
+- stage RES_RCO files
+- produce a clean package zip
 
 ## Important
 
-This is still a staged build.
+This still uses:
 
-The included `paf_compat.h` lets GitHub Actions compile the project in a normal VitaSDK container that does not include Sony/PAF headers.
+```txt
+VitaHUD_Shell/paf_compat.h
+```
 
-For a real visible PAF overlay on hardware, the next step is replacing the compatibility shim with real PAF imports/headers and compiling the RCO resource.
+That means this is **not the final visible PAF overlay yet**.
 
-## What v2 adds
+The next phase is real PAF/RCO wiring.
 
-- RCO-style resource folder
-- `vitahud_plugin.xml`
-- English locale XML
-- cleaner HUD test text target
-- `Hud::Create()` now uses a structured PageOpen/TemplateOpen style path
-- `Menu::Open()` is prepared for a PAF page instead of framebuffer drawing
+## GitHub Actions
 
-## Current limitations
+Use the included workflow:
 
-- No RAM/IP yet
-- No real PAF rendering until actual PAF/RCO wiring is available
-- GitHub Actions artifact is compile proof, not final install proof
+```txt
+.github/workflows/build.yml
+```
 
-## Credits
+It builds from:
 
-PSVshellPlus by GrapheneCt was used as a reference for the general PS Vita shell/PAF overlay architecture and telemetry separation approach.
-This VitaHUD PAF v2 package is a fresh skeleton and does not include PSVshellPlus source files.
+```txt
+VitaHUD_PAF_v1/
+```
+
+and creates:
+
+```txt
+VitaHUD_PAF_v1/build/VitaHUD_PAF_v3_package.zip
+```
+
+## Package layout
+
+The package zip contains:
+
+```txt
+VitaHUD_PAF_v3_package/
+  ur0/
+    tai/
+      vitahud_paf_v2.suprx
+    data/
+      VitaHUD/
+        vitahud_plugin.xml
+        locale/
+          vitahud_locale_en.xml
+  docs/
+    STATUS.txt
+  INSTALL.txt
+```
+
+## Status
+
+Working:
+
+- VitaSDK build
+- GitHub Actions artifact
+- package output
+- staged RCO/XML resources
+- HUD/Menu source structure
+- profile source structure
+
+Not final yet:
+
+- real PAF headers/imports
+- compiled `.rco`
+- real visible overlay
+- RAM/IP telemetry
