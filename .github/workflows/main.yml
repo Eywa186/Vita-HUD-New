@@ -80,7 +80,7 @@ jobs:
           EOF
 
           cd build
-          zip -r VitaHUD_PAF_v3_package.zip VitaHUD_PAF_v3_package
+          tar -czf VitaHUD_PAF_v3_package.tar.gz VitaHUD_PAF_v3_package
 
           echo "Final build directory:"
           ls -la
@@ -91,5 +91,5 @@ jobs:
           name: VitaHUD-PAF-v3.1-package
           path: |
             VitaHUD_PAF_v1/build/vitahud_paf_v3.suprx
-            VitaHUD_PAF_v1/build/VitaHUD_PAF_v3_package.zip
+            VitaHUD_PAF_v1/build/VitaHUD_PAF_v3_package.tar.gz
             VitaHUD_PAF_v1/build/VitaHUD_PAF_v3_package/**
