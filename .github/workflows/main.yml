@@ -21,13 +21,20 @@ jobs:
       - name: Configure
         working-directory: VitaHUD_PAF_v1
         run: |
+          export VITASDK=/usr/local/vitasdk
+          export PATH=$VITASDK/bin:$PATH
           mkdir -p build
           cd build
-          cmake ..
+          cmake .. \
+            -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake \
+            -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         working-directory: VitaHUD_PAF_v1/build
-        run: make
+        run: |
+          export VITASDK=/usr/local/vitasdk
+          export PATH=$VITASDK/bin:$PATH
+          make VERBOSE=1
 
       - name: Upload artifact
         if: always()
@@ -38,3 +45,4 @@ jobs:
             VitaHUD_PAF_v1/build/*.suprx
             VitaHUD_PAF_v1/build/*.elf
             VitaHUD_PAF_v1/build/*.velf
+            VitaHUD_PAF_v1/build/*.self
