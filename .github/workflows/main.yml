@@ -22,17 +22,17 @@ jobs:
           ls -la
 
           rm -rf VitaHUD_PAF_v1
-          rm -rf VitaHUD_PAF_v6_0_main_thread_widget_probe
+          rm -rf VitaHUD_PAF_v6_1_rco_ready_compile_base
 
-          cmake -E tar xf VitaHUD_PAF_v6_0_main_thread_widget_probe.zip --format=zip
+          cmake -E tar xf VitaHUD_PAF_v6_1_rco_ready_compile_base.zip --format=zip
 
           echo "After extracting:"
           ls -la
 
-          if [ -d VitaHUD_PAF_v6_0_main_thread_widget_probe ]; then
-            mv VitaHUD_PAF_v6_0_main_thread_widget_probe VitaHUD_PAF_v1
+          if [ -d VitaHUD_PAF_v6_1_rco_ready_compile_base ]; then
+            mv VitaHUD_PAF_v6_1_rco_ready_compile_base VitaHUD_PAF_v1
           else
-            echo "ERROR: extracted folder VitaHUD_PAF_v6_0_main_thread_widget_probe not found"
+            echo "ERROR: extracted folder VitaHUD_PAF_v6_1_rco_ready_compile_base not found"
             find . -maxdepth 3 -type d -print
             exit 1
           fi
