@@ -1,4 +1,4 @@
-name: Build VitaHUD PAF
+name: Build VitaHUD PAF VDSuite
 
 on:
   push:
@@ -15,6 +15,37 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Prepare v5 source from ZIP
+        run: |
+          echo "Repo root:"
+          ls -la
+
+          rm -rf _v5_extract
+          mkdir -p _v5_extract
+
+          cmake -E tar xzf VitaHUD_PAF_v5_vdsuite_real_paf_probe.zip --format=zip
+          
+          echo "After extracting:"
+          ls -la
+
+          if [ -d VitaHUD_PAF_v5_vdsuite_real_paf_probe ]; then
+            rm -rf VitaHUD_PAF_v1
+            cp -R VitaHUD_PAF_v5_vdsuite_real_paf_probe VitaHUD_PAF_v1
+          elif [ -d _v5_extract/VitaHUD_PAF_v5_vdsuite_real_paf_probe ]; then
+            rm -rf VitaHUD_PAF_v1
+            cp -R _v5_extract/VitaHUD_PAF_v5_vdsuite_real_paf_probe VitaHUD_PAF_v1
+          fi
+
+          echo "Prepared VitaHUD_PAF_v1:"
+          ls -la VitaHUD_PAF_v1
+
+      - name: Show VDSuite files
+        working-directory: VitaHUD_PAF_v1
+        run: |
+          echo "Checking bundled VDSuite paths..."
+          ls -la external/vdsuite/sdk/target/include/vdsuite/user | head || true
+          ls -la external/vdsuite/sdk/target/lib/vdsuite | grep Paf || true
 
       - name: Configure
         working-directory: VitaHUD_PAF_v1
@@ -38,60 +69,42 @@ jobs:
           ls -la
 
       - name: Package artifact
+        if: always()
         working-directory: VitaHUD_PAF_v1
         run: |
-          mkdir -p build/VitaHUD_PAF_v4_package/ur0/tai
-          mkdir -p build/VitaHUD_PAF_v4_package/ur0/data/VitaHUD
-          mkdir -p build/VitaHUD_PAF_v4_package/docs
+          mkdir -p build/VitaHUD_PAF_v5_package/ur0/tai
+          mkdir -p build/VitaHUD_PAF_v5_package/ur0/data/VitaHUD
+          mkdir -p build/VitaHUD_PAF_v5_package/docs
 
-          if [ -f build/vitahud_paf_v4.suprx ]; then
-            cp build/vitahud_paf_v4.suprx build/VitaHUD_PAF_v4_package/ur0/tai/vitahud_paf_v4.suprx
-          fi
-
-          if [ -f build/vitahud_plugin.rco ]; then
-            cp build/vitahud_plugin.rco build/VitaHUD_PAF_v4_package/ur0/data/VitaHUD/vitahud_plugin.rco
+          if [ -f build/vitahud_paf_v5.suprx ]; then
+            cp build/vitahud_paf_v5.suprx build/VitaHUD_PAF_v5_package/ur0/tai/vitahud_paf_v5.suprx
           fi
 
           if [ -d VitaHUD_Shell/RES_RCO ]; then
-            cp -R VitaHUD_Shell/RES_RCO/* build/VitaHUD_PAF_v4_package/ur0/data/VitaHUD/ || true
+            cp -R VitaHUD_Shell/RES_RCO/* build/VitaHUD_PAF_v5_package/ur0/data/VitaHUD/ || true
           fi
 
-          cat > build/VitaHUD_PAF_v4_package/INSTALL.txt <<'EOF'
-          VitaHUD PAF v4 package
+          cat > build/VitaHUD_PAF_v5_package/docs/STATUS.txt <<'EOF'
+          VitaHUD PAF v5 VDSuite probe
 
-          Current status:
-          - Real PAF mode test build.
-          - This is expected to fail until real paf.h and PAF imports are added.
+          Goal:
+          - Test bundled real VDSuite PAF headers/libs in GitHub Actions.
 
-          Target paths later:
-          ur0:tai/vitahud_paf_v4.suprx
-          ur0:data/VitaHUD/vitahud_plugin.rco
-          EOF
-
-          cat > build/VitaHUD_PAF_v4_package/docs/STATUS.txt <<'EOF'
-          VitaHUD PAF v4 status
-
-          Testing:
-          - VITAHUD_USE_REAL_PAF=ON
-
-          Expected next issue:
-          - Missing real paf.h
-          - Missing PAF import libraries
-          - Missing real RCO compiler/wiring
+          If this fails:
+          - The error will show which PAF API mismatch must be adapted next.
           EOF
 
           cd build
-          tar -czf VitaHUD_PAF_v4_package.tar.gz VitaHUD_PAF_v4_package
-
-          echo "Final build directory:"
-          ls -la
+          tar -czf VitaHUD_PAF_v5_package.tar.gz VitaHUD_PAF_v5_package
 
       - name: Upload artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: VitaHUD-PAF-v4-real-paf-test
+          name: VitaHUD-PAF-v5-vdsuite-probe
           path: |
-            VitaHUD_PAF_v1/build/vitahud_paf_v4.suprx
-            VitaHUD_PAF_v1/build/VitaHUD_PAF_v4_package.tar.gz
-            VitaHUD_PAF_v1/build/VitaHUD_PAF_v4_package/**
+            VitaHUD_PAF_v1/build/vitahud_paf_v5.suprx
+            VitaHUD_PAF_v1/build/VitaHUD_PAF_v5_package.tar.gz
+            VitaHUD_PAF_v1/build/VitaHUD_PAF_v5_package/**
+            VitaHUD_PAF_v1/build/CMakeFiles/CMakeOutput.log
+            VitaHUD_PAF_v1/build/CMakeFiles/CMakeError.log
