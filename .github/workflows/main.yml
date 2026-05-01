@@ -22,17 +22,17 @@ jobs:
           ls -la
 
           rm -rf VitaHUD_PAF_v1
-          rm -rf VitaHUD_PAF_v5_7_type_conflict_fix
+          rm -rf VitaHUD_PAF_v5_8_real_vdsuite_api_align
 
-          cmake -E tar xf VitaHUD_PAF_v5_7_type_conflict_fix.zip --format=zip
+          cmake -E tar xf VitaHUD_PAF_v5_8_real_vdsuite_api_align.zip --format=zip
 
           echo "After extracting:"
           ls -la
 
-          if [ -d VitaHUD_PAF_v5_7_type_conflict_fix ]; then
-            mv VitaHUD_PAF_v5_7_type_conflict_fix VitaHUD_PAF_v1
+          if [ -d VitaHUD_PAF_v5_8_real_vdsuite_api_align ]; then
+            mv VitaHUD_PAF_v5_8_real_vdsuite_api_align VitaHUD_PAF_v1
           else
-            echo "ERROR: extracted folder VitaHUD_PAF_v5_7_type_conflict_fix not found"
+            echo "ERROR: extracted folder VitaHUD_PAF_v5_8_real_vdsuite_api_align not found"
             find . -maxdepth 3 -type d -print
             exit 1
           fi
