@@ -16,13 +16,16 @@ add_executable(vitahud_paf_v5
     src/main.c
 )
 
-target_link_libraries(vitahud_paf_v5
-    SceIofilemgr_stub
-    SceDisplay_stub
-)
-
 set_target_properties(vitahud_paf_v5 PROPERTIES
     LINK_FLAGS "-nostdlib -Wl,-e,module_start"
+)
+
+target_link_libraries(vitahud_paf_v5
+    SceLibKernel_stub
+    SceIofilemgr_stub
+    SceIofilemgrForDriver_stub
+    SceDisplay_stub
+    SceDisplayUser_stub
 )
 
 vita_create_self(vitahud_paf_v5.suprx vitahud_paf_v5
