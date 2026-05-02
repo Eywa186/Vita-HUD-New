@@ -1,16 +1,24 @@
-# VitaHUD PAF v6.7 Hard Alive + Framebuffer Probe
+# VitaHUD PAF v6.9 Live Screen Probe
 
-This is a diagnostic build.
+Hard alive-log plus live framebuffer thread test.
 
-It keeps the proven alive log test and adds the smallest direct framebuffer visual probe.
+Install built `vitahud_paf_v5.suprx` to:
 
-Expected log:
+```txt
+ur0:tai/vitahud_paf_v5.suprx
+```
 
-- `ur0:data/VitaHUD/vitahud_alive.txt`
-- fallback: `ux0:data/VitaHUD/vitahud_alive_ux0_fallback.txt`
+Config:
 
-Expected visual result:
+```txt
+*main
+ur0:tai/vitahud_paf_v5.suprx
+```
 
-- A small block near the top-left of the screen during boot/shell start.
+After reboot check:
 
-If the log appears but no box appears, the SUPRX loads but direct framebuffer drawing is not usable from this context.
+```txt
+ur0:data/VitaHUD/vitahud_alive.txt
+```
+
+Look top-left for a flashing rectangle.

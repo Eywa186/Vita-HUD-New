@@ -22,6 +22,7 @@ set_target_properties(vitahud_paf_v5 PROPERTIES
 
 target_link_libraries(vitahud_paf_v5
     SceLibKernel_stub
+    SceKernelThreadMgr_stub
     SceIofilemgr_stub
     SceIofilemgrForDriver_stub
     SceDisplay_stub

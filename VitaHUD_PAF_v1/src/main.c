@@ -2,6 +2,11 @@
 #include <psp2/io/stat.h>
 #include <psp2/types.h>
 #include <psp2/display.h>
+#include <psp2/kernel/threadmgr.h>
+
+#ifndef SCE_DISPLAY_SETBUF_NEXTFRAME
+#define SCE_DISPLAY_SETBUF_NEXTFRAME 0
+#endif
 
 #define MODULE_START_SUCCESS 0
 #define MODULE_STOP_SUCCESS 0
@@ -12,35 +17,6 @@ static int my_strlen(const char *s)
     if (!s) return 0;
     while (s[len] != 0) len++;
     return len;
-}
-
-static void write_text_file(const char *path, const char *text, int flags)
-{
-    SceUID fd = sceIoOpen(path, flags, 0777);
-    if (fd >= 0) {
-        sceIoWrite(fd, text, my_strlen(text));
-        sceIoClose(fd);
-    }
-}
-
-static void log_line(const char *line)
-{
-    sceIoMkdir("ur0:data", 0777);
-    sceIoMkdir("ur0:data/VitaHUD", 0777);
-    sceIoMkdir("ux0:data", 0777);
-    sceIoMkdir("ux0:data/VitaHUD", 0777);
-
-    write_text_file(
-        "ur0:data/VitaHUD/vitahud_alive.txt",
-        line,
-        SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND
-    );
-
-    write_text_file(
-        "ux0:data/VitaHUD/vitahud_alive_ux0_fallback.txt",
-        line,
-        SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND
-    );
 }
 
 static void my_copy(char *dst, const char *src)
@@ -95,79 +71,133 @@ static void my_append_int(char *dst, int value)
     }
 }
 
-static void log_int(const char *label, int value)
+static void write_text_file(const char *path, const char *text, int flags)
+{
+    SceUID fd = sceIoOpen(path, flags, 0777);
+    if (fd >= 0) {
+        sceIoWrite(fd, text, my_strlen(text));
+        sceIoClose(fd);
+    }
+}
+
+static void log_line(const char *line)
+{
+    sceIoMkdir("ur0:data", 0777);
+    sceIoMkdir("ur0:data/VitaHUD", 0777);
+    sceIoMkdir("ux0:data", 0777);
+    sceIoMkdir("ux0:data/VitaHUD", 0777);
+
+    write_text_file("ur0:data/VitaHUD/vitahud_alive.txt", line, SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND);
+    write_text_file("ux0:data/VitaHUD/vitahud_alive_ux0_fallback.txt", line, SCE_O_WRONLY | SCE_O_CREAT | SCE_O_APPEND);
+}
+
+static void log_int_line(const char *prefix, int value)
 {
     char buffer[128];
-    my_copy(buffer, label);
+    my_copy(buffer, prefix);
     my_append_int(buffer, value);
     my_append(buffer, "\n");
     log_line(buffer);
 }
 
-/*
-   Hard framebuffer probe:
-   - no PAF
-   - no RCO
-   - no font/text engine
-   - attempts to access the current display framebuffer and paint a tiny box
-   - repeats briefly so it is not instantly overwritten
-*/
-static void draw_probe_box(void)
+static void draw_box(unsigned int *base, int pitch, int x, int y, int w, int h, unsigned int color)
 {
-    SceDisplayFrameBuf fb;
-    int ret;
-    int repeat;
+    int yy;
+    int xx;
 
-    log_line("v6.7 framebuffer probe: begin\n");
-
-    fb.size = sizeof(SceDisplayFrameBuf);
-    ret = sceDisplayGetFrameBuf(&fb, SCE_DISPLAY_SETBUF_NEXTFRAME);
-
-    log_int("sceDisplayGetFrameBuf ret: ", ret);
-    log_int("fb.width: ", (int)fb.width);
-    log_int("fb.height: ", (int)fb.height);
-    log_int("fb.pitch: ", (int)fb.pitch);
-    log_int("fb.pixelformat: ", (int)fb.pixelformat);
-
-    if (ret < 0 || fb.base == 0) {
-        log_line("v6.7 framebuffer probe: failed or null base\n");
-        return;
-    }
-
-    /* Most Vita framebuffers are 32-bit pixels. This probe assumes 4 bytes per pixel. */
-    for (repeat = 0; repeat < 2500; repeat++) {
-        unsigned int *pixels = (unsigned int *)fb.base;
-        int x;
-        int y;
-
-        /* top-left bright box, 90x42 */
-        for (y = 18; y < 60; y++) {
-            for (x = 18; x < 108; x++) {
-                pixels[(y * fb.pitch) + x] = 0xFF00FFFF; /* ARGB-ish cyan/yellow depending format */
-            }
-        }
-
-        /* smaller inner block to make it obvious */
-        for (y = 28; y < 50; y++) {
-            for (x = 30; x < 96; x++) {
-                pixels[(y * fb.pitch) + x] = 0xFFFF0000; /* ARGB-ish red/blue depending format */
-            }
+    for (yy = 0; yy < h; yy++) {
+        unsigned int *row = base + ((y + yy) * pitch) + x;
+        for (xx = 0; xx < w; xx++) {
+            row[xx] = color;
         }
     }
+}
 
-    log_line("v6.7 framebuffer probe: draw loop finished\n");
+static int live_screen_thread(SceSize args, void *argp)
+{
+    int tick = 0;
+    int good_frames = 0;
+
+    (void)args;
+    (void)argp;
+
+    log_line("v6.9 live screen thread started\n");
+
+    while (tick < 600) {
+        SceDisplayFrameBuf fb;
+        int ret;
+
+        fb.size = sizeof(SceDisplayFrameBuf);
+        fb.base = 0;
+        fb.pitch = 0;
+        fb.width = 0;
+        fb.height = 0;
+        fb.pixelformat = 0;
+
+        ret = sceDisplayGetFrameBuf(&fb, SCE_DISPLAY_SETBUF_NEXTFRAME);
+
+        if ((tick % 30) == 0) {
+            log_int_line("sceDisplayGetFrameBuf ret: ", ret);
+            log_int_line("fb.width: ", (int)fb.width);
+            log_int_line("fb.height: ", (int)fb.height);
+            log_int_line("fb.pitch: ", (int)fb.pitch);
+            log_int_line("fb.pixelformat: ", (int)fb.pixelformat);
+        }
+
+        if (ret >= 0 && fb.base != 0 && fb.pitch > 0) {
+            unsigned int color;
+            int x = 20;
+            int y = 20;
+            int w = 96;
+            int h = 48;
+
+            good_frames++;
+
+            if ((tick & 1) == 0) {
+                color = 0xFFFF00FF; /* bright magenta */
+            } else {
+                color = 0xFF00FFFF; /* cyan/yellow depending format, still obvious */
+            }
+
+            draw_box((unsigned int *)fb.base, (int)fb.pitch, x, y, w, h, color);
+            draw_box((unsigned int *)fb.base, (int)fb.pitch, x + 8, y + 8, w - 16, h - 16, 0xFF000000);
+        }
+
+        tick++;
+        sceKernelDelayThread(100 * 1000); /* 100ms */
+    }
+
+    log_int_line("v6.9 live screen thread finished. good_frames: ", good_frames);
+    return 0;
 }
 
 int module_start(SceSize args, void *argp)
 {
+    SceUID thid;
+
     (void)args;
     (void)argp;
 
-    log_line("\nVitaHUD v6.7 HARD ALIVE + FRAMEBUFFER TEST\n");
+    log_line("\nVitaHUD v6.9 LIVE SCREEN TEST\n");
     log_line("module_start reached successfully\n");
-    log_line("No PAF, no RCO, no menu. Direct framebuffer probe only.\n");
+    log_line("Starting live framebuffer thread. Look top-left for flashing box.\n");
 
-    draw_probe_box();
+    thid = sceKernelCreateThread(
+        "VitaHUDLiveScreen",
+        live_screen_thread,
+        0x10000100,
+        0x10000,
+        0,
+        0,
+        0
+    );
+
+    log_int_line("sceKernelCreateThread ret: ", thid);
+
+    if (thid >= 0) {
+        int ret = sceKernelStartThread(thid, 0, 0);
+        log_int_line("sceKernelStartThread ret: ", ret);
+    }
 
     log_line("module_start success return\n");
     return MODULE_START_SUCCESS;
@@ -177,7 +207,6 @@ int module_stop(SceSize args, void *argp)
 {
     (void)args;
     (void)argp;
-
     log_line("module_stop called\n");
     return MODULE_STOP_SUCCESS;
 }
