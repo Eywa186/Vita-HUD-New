@@ -1,20 +1,16 @@
-# VitaHUD PAF v6.6 Hard Alive Log
+# VitaHUD PAF v6.7 Hard Alive + Framebuffer Probe
 
-This is not a visual HUD build.
+This is a diagnostic build.
 
-It is a hard loading diagnostic build. It proves whether taiHEN actually loads `ur0:tai/vitahud_paf_v5.suprx`.
+It keeps the proven alive log test and adds the smallest direct framebuffer visual probe.
 
-When loaded, it immediately writes:
+Expected log:
 
-```txt
-ur0:data/VitaHUD/vitahud_alive.txt
-```
+- `ur0:data/VitaHUD/vitahud_alive.txt`
+- fallback: `ux0:data/VitaHUD/vitahud_alive_ux0_fallback.txt`
 
-Fallback:
+Expected visual result:
 
-```txt
-ux0:data/VitaHUD/vitahud_alive_ux0_fallback.txt
-```
+- A small block near the top-left of the screen during boot/shell start.
 
-If either file exists after reboot, the plugin loaded and the config/path are good.
-If neither file exists, taiHEN did not load the plugin.
+If the log appears but no box appears, the SUPRX loads but direct framebuffer drawing is not usable from this context.

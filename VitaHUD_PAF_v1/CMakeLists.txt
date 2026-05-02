@@ -17,12 +17,10 @@ add_executable(vitahud_paf_v5
 )
 
 target_link_libraries(vitahud_paf_v5
-    SceLibKernel_stub
     SceIofilemgr_stub
+    SceDisplay_stub
 )
 
-# taiHEN plugin-style build:
-# no crt0, no app main(), no newlib startup/shutdown
 set_target_properties(vitahud_paf_v5 PROPERTIES
     LINK_FLAGS "-nostdlib -Wl,-e,module_start"
 )
