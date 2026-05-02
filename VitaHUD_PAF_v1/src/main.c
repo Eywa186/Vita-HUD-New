@@ -1,4 +1,4 @@
-#include <psp2/moduleinfo.h>
+#include <vitasdk.h>
 #include <psp2/kernel/modulemgr.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/io/fcntl.h>
@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-SCE_MODULE_INFO("VitaHUDAlive", 0, 1, 0);
+VITA_MODULE_INFO(0, 0, "VitaHUDAlive");
 
 static void write_text_file(const char *path, const char *text, int flags)
 {
