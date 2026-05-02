@@ -1,18 +1,16 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  if(DEFINED ENV{VITASDK})
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
-  endif()
+    if(DEFINED ENV{VITASDK})
+        set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE PATH "toolchain file")
+    endif()
 endif()
 
-project(VitaHUD_PAF_v6_6_HardAliveLog C)
+project(vitahud_paf_v5 C)
 
 include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
-set(VITA_APP_NAME "VitaHUD Alive Log")
-set(VITA_TITLEID  "VHUD00001")
-set(VITA_VERSION  "01.00")
+set(CMAKE_C_STANDARD 11)
 
 add_executable(vitahud_paf_v5
     src/main.c
@@ -23,11 +21,12 @@ target_link_libraries(vitahud_paf_v5
     SceIofilemgr_stub
 )
 
-vita_create_self(vitahud_paf_v5.suprx vitahud_paf_v5 UNSAFE)
+# Critical: plugin has module_start/module_stop, not main()
+# This prevents crt0.o from requiring main()
+set_target_properties(vitahud_paf_v5 PROPERTIES
+    LINK_FLAGS "-nostartfiles"
+)
 
-add_custom_target(copy_package ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/VitaHUD_PAF_v6_6_package/ur0/tai
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/VitaHUD_PAF_v6_6_package/ur0/data/VitaHUD
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/vitahud_paf_v5.suprx ${CMAKE_SOURCE_DIR}/VitaHUD_PAF_v6_6_package/ur0/tai/vitahud_paf_v5.suprx
-    DEPENDS vitahud_paf_v5.suprx
+vita_create_self(vitahud_paf_v5.suprx vitahud_paf_v5
+    UNSAFE
 )
