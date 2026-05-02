@@ -1,3 +1,4 @@
+#include <psp2/moduleinfo.h>
 #include <psp2/kernel/modulemgr.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/io/fcntl.h>
@@ -6,11 +7,12 @@
 #include <stdio.h>
 #include <string.h>
 
-SCE_MODULE_INFO("VitaHUDAlive", SCE_MODULE_ATTR_NONE, 1, 0);
+SCE_MODULE_INFO("VitaHUDAlive", 0, 1, 0);
 
 static void write_text_file(const char *path, const char *text, int flags)
 {
     SceUID fd = sceIoOpen(path, flags, 0777);
+
     if (fd >= 0) {
         sceIoWrite(fd, text, strlen(text));
         sceIoClose(fd);
@@ -19,7 +21,10 @@ static void write_text_file(const char *path, const char *text, int flags)
 
 static void log_line(const char *line)
 {
+    sceIoMkdir("ur0:data", 0777);
     sceIoMkdir("ur0:data/VitaHUD", 0777);
+
+    sceIoMkdir("ux0:data", 0777);
     sceIoMkdir("ux0:data/VitaHUD", 0777);
 
     write_text_file(
@@ -49,7 +54,7 @@ static int alive_thread(SceSize args, void *argp)
         snprintf(buffer, sizeof(buffer), "InputThread heartbeat: %d\n", counter++);
         log_line(buffer);
 
-        sceKernelDelayThread(5 * 1000 * 1000); // 5 seconds
+        sceKernelDelayThread(5 * 1000 * 1000);
     }
 
     return 0;
