@@ -1,24 +1,14 @@
-# VitaHUD PAF v6.9 Live Screen Probe
+# VitaHUD PAF v7.0 Shell Visual + Resource Logger
 
-Hard alive-log plus live framebuffer thread test.
+This build does not use framebuffer. It keeps the proven alive log and tries a shell notification visual test after a 5 second delay.
 
-Install built `vitahud_paf_v5.suprx` to:
+It also probes:
 
-```txt
-ur0:tai/vitahud_paf_v5.suprx
-```
+- ur0:data/VitaHUD/sample_plugin.rco
+- ur0:data/VitaHUD/sample_plugin.xml
+- ur0:data/VitaHUD/vitahud_plugin.xml
 
-Config:
+Log output:
 
-```txt
-*main
-ur0:tai/vitahud_paf_v5.suprx
-```
-
-After reboot check:
-
-```txt
-ur0:data/VitaHUD/vitahud_alive.txt
-```
-
-Look top-left for a flashing rectangle.
+- ur0:data/VitaHUD/vitahud_alive.txt
+- ux0:data/VitaHUD/vitahud_alive_ux0_fallback.txt

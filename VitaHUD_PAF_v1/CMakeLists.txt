@@ -25,7 +25,7 @@ target_link_libraries(vitahud_paf_v5
     SceKernelThreadMgr_stub
     SceIofilemgr_stub
     SceIofilemgrForDriver_stub
-    SceDisplay_stub
+    SceNotificationUtil_stub
 )
 
 vita_create_self(vitahud_paf_v5.suprx vitahud_paf_v5
