@@ -21,10 +21,10 @@ target_link_libraries(vitahud_paf_v5
     SceIofilemgr_stub
 )
 
-# Critical: plugin has module_start/module_stop, not main()
-# This prevents crt0.o from requiring main()
+# taiHEN plugin-style build:
+# no crt0, no app main(), no newlib startup/shutdown
 set_target_properties(vitahud_paf_v5 PROPERTIES
-    LINK_FLAGS "-nostartfiles"
+    LINK_FLAGS "-nostdlib -Wl,-e,module_start"
 )
 
 vita_create_self(vitahud_paf_v5.suprx vitahud_paf_v5
